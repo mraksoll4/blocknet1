@@ -288,6 +288,11 @@ public:
             if (failureReasonRet) *failureReasonRet = strprintf("Bad superblock number, did you mean %d", gov::NextSuperblock(params));
             return false;
         }
+        if (!(amount >= params.proposalMinAmount && amount <= std::min(params.proposalMaxAmount, params.GetBlockSubsidy(superblock, params)))) {
+            if (failureReasonRet) *failureReasonRet = strprintf("Bad proposal amount, specify amount between %s - %s",
+                    FormatMoney(params.proposalMinAmount), FormatMoney(std::min(params.proposalMaxAmount, params.GetBlockSubsidy(superblock, params))));
+            return false;
+        }
         if (!IsValidDestination(DecodeDestination(address))) {
             if (failureReasonRet) *failureReasonRet = strprintf("Bad payment address %s", address);
             return false;
@@ -2279,7 +2284,7 @@ public: // static
         // Proposals that do not fit are skipped and the other
         // remaining proposals are filled in its place.
         std::map<CTxDestination, CAmount> payees;
-        CAmount superblockTotal = std::min(params.proposalMaxAmount);
+        CAmount superblockTotal = std::min(params.proposalMaxAmount, params.GetBlockSubsidy(superblock, params));
         do {
             // Add the payee if the requested amount fits
             // in the superblock.
