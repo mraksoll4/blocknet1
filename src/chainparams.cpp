@@ -193,7 +193,7 @@ public:
 			baseReward >>= halvings;
             return baseReward;
             if (blockHeight % consensusParams.superblock == 0) {
-				if (blockHeight >= 20000000)         return consensusParams.proposalMaxAmount + baseReward; // phase 2 superblock
+				if (blockHeight >= 6000000)         return consensusParams.proposalMaxAmount + baseReward; // phase 2 superblock
 			}
         };
 
