@@ -190,11 +190,11 @@ public:
                     return 0;
 			
             CAmount baseReward = 50 * COIN;
-			baseReward >>= halvings;
-			return baseReward;
             if (blockHeight % consensusParams.superblock == 0) {
 				if (blockHeight >= 6000000)         return consensusParams.proposalMaxAmount + 1 * COIN; // phase 2 superblock
 			}
+			baseReward >>= halvings;
+			return baseReward;
         };
 
     }
