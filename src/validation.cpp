@@ -3223,23 +3223,11 @@ static bool FindUndoPos(CValidationState &state, int nFile, CDiskBlockPos &pos, 
 
 static bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const Consensus::Params& consensusParams, bool fCheckPOW = true)
 {
-    if (!fCheckPOW)
-        return true;
-
     // Check proof of work matches claimed amount
-    if (block.hashStake.IsNull()) {
-        if (!CheckProofOfWork(block.GetHash(), block.nBits, consensusParams))
-            return state.DoS(50, false, REJECT_INVALID, "high-hash", false, "proof of work failed");
-        return true;
-    }
+    if (fCheckPOW && !CheckProofOfWork(block.GetHash(), block.nBits, consensusParams))
+        return state.DoS(50, false, REJECT_INVALID, "high-hash", false, "proof of work failed");
 
-    // Check proof of stake
-    uint256 blockHash = block.GetHash();
-    uint256 hashProofOfStake;
-    bool valid = CheckPoS(block, state, hashProofOfStake, consensusParams);
-    if (valid && !HasHashProofOfStake(blockHash))
-        SetHashProofOfStake(blockHash, hashProofOfStake);
-    return valid;
+    return true;
 }
 
 bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::Params& consensusParams, bool fCheckPOW, bool fCheckMerkleRoot)
