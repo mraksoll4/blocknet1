@@ -82,6 +82,7 @@ struct Params {
     uint256 nMinimumChainWork;
     uint256 defaultAssumeValid;
 	int lastPOWBlock;
+    std::function<CAmount(const int&, const Params &)> GetBlockSubsidy;
     /** Service node parameters */
     int snMaxCollateralCount{10}; // max utxos for use with service node collateral
     /** Governance parameters */
