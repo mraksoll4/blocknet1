@@ -183,20 +183,16 @@ public:
         consensus.proposalMaxAmount = 40000 * COIN;
         consensus.governanceBlock = 4296001;
 
-        // subsidy func mainnet
+
+        // subsidy func testnet
         consensus.GetBlockSubsidy = [](const int & blockHeight, const Consensus::Params & consensusParams) {
-            if (blockHeight >= 0) = 50 * COIN;
-            else if (blockHeight >= 210000)        return 25 * COIN; // from previous mainnet
-            else if (blockHeight >= 420000)        return 12.5 * COIN; // expl amounts
-            else if (blockHeight >= 630000)        return 6.25 * COIN;
-            else if (blockHeight >= 840000)        return 3.125 * COIN;
-            else if (blockHeight >= 1050000)        return 1.5625 * COIN;
-            else if (blockHeight % consensusParams.superblock == 0) { // superblocks
-               if (blockHeight >= 20000000)         return consensusParams.proposalMaxAmount + 1 * COIN; // phase 2 superblock
-               else                               return 1 * COIN; // phase 1 superblock
-            }
-            else
-                return 1 * COIN;
+            if (blockHeight >= 0)
+                return 50* COIN;
+			else if (blockHeight >= 210000)        
+				return 25 * COIN; // from previous mainnet
+            else if (blockHeight >= % consensusParams.superblock == 0)
+                return consensusParams.proposalMaxAmount + 1 * COIN;
+            return 1 * COIN;
         };
 
     }
@@ -305,6 +301,14 @@ public:
         consensus.proposalMaxAmount = 20000 * COIN;
         consensus.governanceBlock = 267500;
 
+        // subsidy func testnet
+        consensus.GetBlockSubsidy = [](const int & blockHeight, const Consensus::Params & consensusParams) {
+            if (blockHeight <= 32)
+                return 5000 * COIN;
+            else if (blockHeight > consensusParams.lastPOWBlock && blockHeight % consensusParams.superblock == 0)
+                return consensusParams.proposalMaxAmount + 1 * COIN;
+            return 1 * COIN;
+        };
     }
 };
 
@@ -398,6 +402,14 @@ public:
         consensus.proposalMaxAmount = 40000 * COIN;
         consensus.governanceBlock = 1;
 
+        // subsidy func testnet
+        consensus.GetBlockSubsidy = [](const int & blockHeight, const Consensus::Params & consensusParams) {
+            if (blockHeight <= consensusParams.lastPOWBlock)
+                return 50 * COIN;
+            else if (blockHeight % consensusParams.superblock == 0)
+                return consensusParams.proposalMaxAmount + 1 * COIN;
+            return 1 * COIN;
+        };
     }
 
     /**
