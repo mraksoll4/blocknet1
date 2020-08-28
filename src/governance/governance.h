@@ -2279,7 +2279,7 @@ public: // static
         // Proposals that do not fit are skipped and the other
         // remaining proposals are filled in its place.
         std::map<CTxDestination, CAmount> payees;
-        CAmount superblockTotal = std::min(params.proposalMaxAmount, params.GetBlockSubsidy(superblock, params));
+        CAmount superblockTotal = std::min(params.proposalMaxAmount);
         do {
             // Add the payee if the requested amount fits
             // in the superblock.
