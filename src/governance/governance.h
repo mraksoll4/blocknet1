@@ -288,11 +288,6 @@ public:
             if (failureReasonRet) *failureReasonRet = strprintf("Bad superblock number, did you mean %d", gov::NextSuperblock(params));
             return false;
         }
-        if (!(amount >= params.proposalMaxAmount)) {
-            if (failureReasonRet) *failureReasonRet = strprintf("Bad proposal amount, specify amount between %s - %s",
-                    FormatMoney(params.proposalMinAmount), FormatMoney(std::min(params.proposalMaxAmount, params.GetBlockSubsidy(superblock, params))));
-            return false;
-        }
         if (!IsValidDestination(DecodeDestination(address))) {
             if (failureReasonRet) *failureReasonRet = strprintf("Bad payment address %s", address);
             return false;
