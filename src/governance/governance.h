@@ -288,7 +288,7 @@ public:
             if (failureReasonRet) *failureReasonRet = strprintf("Bad superblock number, did you mean %d", gov::NextSuperblock(params));
             return false;
         }
-        if (!(amount >= params.proposalMinAmount && amount <= std::min(params.proposalMaxAmount))) {
+        if (!(amount >= params.proposalMaxAmount)) {
             if (failureReasonRet) *failureReasonRet = strprintf("Bad proposal amount, specify amount between %s - %s",
                     FormatMoney(params.proposalMinAmount), FormatMoney(std::min(params.proposalMaxAmount, params.GetBlockSubsidy(superblock, params))));
             return false;
