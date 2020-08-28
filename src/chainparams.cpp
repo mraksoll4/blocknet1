@@ -183,6 +183,16 @@ public:
         consensus.proposalMaxAmount = 40000 * COIN;
         consensus.governanceBlock = 4296001;
 
+        // subsidy func mainnet
+        consensus.GetBlockSubsidy = [](int nHeight, const int & blockHeight, const Consensus::Params & consensusParams) {
+			int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
+			    if (halvings >= 64)
+                    return 0;
+			
+            CAmount nSubsidy = 50 * COIN;
+            if (blockHeight % consensusParams.superblock == 0)
+        };
+
     }
 };
 
