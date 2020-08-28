@@ -81,6 +81,7 @@ struct Params {
     int64_t DifficultyAdjustmentInterval() const { return nPowTargetTimespan / nPowTargetSpacing; }
     uint256 nMinimumChainWork;
     uint256 defaultAssumeValid;
+	int lastPOWBlock;
     /** Service node parameters */
     int snMaxCollateralCount{10}; // max utxos for use with service node collateral
     /** Governance parameters */
