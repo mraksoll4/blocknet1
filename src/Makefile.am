@@ -128,7 +128,6 @@ BITCOIN_CORE_H = \
   checkqueue.h \
   clientversion.h \
   coins.h \
-  coinvalidator.h \
   compat.h \
   compat/assumptions.h \
   compat/byteswap.h \
@@ -176,7 +175,6 @@ BITCOIN_CORE_H = \
   policy/policy.h \
   policy/rbf.h \
   pow.h \
-  kernel.h \
   protocol.h \
   psbt.h \
   random.h \
@@ -199,7 +197,6 @@ BITCOIN_CORE_H = \
   servicenode/servicenode.h \
   servicenode/servicenodemgr.h \
   shutdown.h \
-  stakemgr.h \
   streams.h \
   support/allocators/secure.h \
   support/allocators/zeroafterfree.h \
@@ -359,7 +356,6 @@ libbitcoin_server_a_SOURCES = \
   policy/policy.cpp \
   policy/rbf.cpp \
   pow.cpp \
-  kernel.cpp \
   rest.cpp \
   rpc/blockchain.cpp \
   rpc/mining.cpp \
@@ -427,7 +423,6 @@ libbitcoin_wallet_a_SOURCES = \
   governance/governancewallet.cpp \
   servicenode/servicenode.cpp \
   servicenode/servicenodemgr.cpp \
-  stakemgr.cpp \
   $(BITCOIN_CORE_H)
 
 libbitcoin_wallet_tool_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
@@ -558,7 +553,6 @@ libbitcoin_util_a_SOURCES = \
   support/lockedpool.cpp \
   chainparamsbase.cpp \
   clientversion.cpp \
-  coinvalidator.cpp \
   compat/glibc_sanity.cpp \
   compat/glibcxx_sanity.cpp \
   compat/strnlen.cpp \

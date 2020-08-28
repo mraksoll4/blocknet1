@@ -14,7 +14,6 @@
 #include <xbridge/xbridgewalletconnector.h>
 
 #include <chainparamsbase.h>
-#include <coinvalidator.h>
 #include <key.h>
 #include <pubkey.h>
 #include <servicenode/servicenodemgr.h>
@@ -260,7 +259,7 @@ bool Exchange::checkUtxoItems(const uint256 & txid, const std::vector<wallet::Ut
     // check
     for (const wallet::UtxoEntry & item : items)
     {
-        if (m_p->m_utxoItems.count(item) || !CoinValidator::instance().IsCoinValid(item.txId)) // check not in bad funds
+        if (m_p->m_utxoItems.count(item)) // check not in bad funds
         {
             // duplicate items
             return false;

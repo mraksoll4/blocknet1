@@ -16,7 +16,6 @@
 #include <chain.h>
 #include <chainparams.h>
 #include <checkpoints.h>
-#include <coinvalidator.h>
 #include <compat/sanity.h>
 #include <consensus/validation.h>
 #include <fs.h>
@@ -25,7 +24,6 @@
 #include <httprpc.h>
 #include <interfaces/chain.h>
 #include <index/txindex.h>
-#include <kernel.h>
 #include <key.h>
 #include <validation.h>
 #include <miner.h>
@@ -59,9 +57,6 @@
 
 #include <xbridge/xbridgeapp.h>
 #include <xrouter/xrouterapp.h>
-#ifdef ENABLE_WALLET
-#include <stakemgr.h>
-#endif
 
 #ifndef WIN32
 #include <attributes.h>
@@ -415,9 +410,6 @@ void SetupServerArgs()
     gArgs.AddArg("-prune=<n>", "Pruning is not supported", false, OptionsCategory::OPTIONS);
     gArgs.AddArg("-reindex", "Rebuild chain state and block index from the blk*.dat files on disk", false, OptionsCategory::OPTIONS);
     gArgs.AddArg("-reindex-chainstate", "Rebuild chain state from the currently indexed blocks. When in pruning mode or if blocks on disk might be corrupted, use full -reindex instead.", false, OptionsCategory::OPTIONS);
-    gArgs.AddArg("-staking", "Mine blocks on this node (default: 1). Can be used to specify search interval, staking=number_of_seconds (default: 15)", false, OptionsCategory::OPTIONS);
-    gArgs.AddArg("-stakingwithoutpeers", "Proceeds with staking even though no peers were detected. Mainly used for testing, this could put you on a fork. (default: 0)", false, OptionsCategory::OPTIONS);
-    gArgs.AddArg("-minstakeamount", strprintf("Only stakes UTXOs greater than or equal to this amount (default: %d)", 0), false, OptionsCategory::OPTIONS);
 #ifndef WIN32
     gArgs.AddArg("-sysperms", "Create new files with system default permissions, instead of umask 077 (only effective with disabled wallet functionality)", false, OptionsCategory::OPTIONS);
 #else
@@ -577,9 +569,6 @@ void SetupServerArgs()
     gArgs.AddArg("-xrouter", strprintf("Enable XRouter services (default: %u)", true), false, OptionsCategory::XROUTER);
     gArgs.AddArg("-xrouterbanscore", strprintf("Ban XRouter nodes who's score is lower than this value (default: %u)", -200), false, OptionsCategory::XROUTER);
     gArgs.AddArg("-rpcxroutertimeout", strprintf("Timeout for internal XRouter RPC calls (default: %d seconds)", 60), false, OptionsCategory::XROUTER);
-
-    // Misc
-    gArgs.AddArg("-printstakemodifier", strprintf("Prints the stake modifier to the log (default: %u)", false), false, OptionsCategory::HIDDEN);
 
 #if HAVE_DECL_DAEMON
     gArgs.AddArg("-daemon", "Run in the background as a daemon and accept commands", false, OptionsCategory::OPTIONS);
@@ -1505,9 +1494,6 @@ bool AppInitMain(InitInterfaces& interfaces)
 
     // ********************************************************* Step 7: load block chain
 
-    // Load coin validator
-    CoinValidator::instance().LoadStatic();
-
     fReindex = gArgs.GetBoolArg("-reindex", false);
     bool fReindexChainState = gArgs.GetBoolArg("-reindex-chainstate", false);
 
@@ -1897,12 +1883,6 @@ bool AppInitMain(InitInterfaces& interfaces)
     if (!g_connman->Start(scheduler, connOptions)) {
         return false;
     }
-
-#ifdef ENABLE_WALLET
-    // Start the staker
-    if (gArgs.GetBoolArg("-staking", true))
-        threadGroup.create_thread(&ThreadStakeMinter);
-#endif
 
     // ********************************************************* Step 13: finished
 

@@ -9,6 +9,9 @@
 #include <chain.h>
 #include <primitives/block.h>
 #include <uint256.h>
+#include <sync.h>
+#include <util/system.h>
+#include <validation.h>
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {

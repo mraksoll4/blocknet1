@@ -32,7 +32,6 @@
 #include <stdint.h>
 
 #ifdef ENABLE_WALLET
-#include <stakemgr.h>
 #include <wallet/wallet.h>
 #include <xbridge/util/xutil.h>
 #endif // ENABLE_WALLET

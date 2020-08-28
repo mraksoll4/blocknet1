@@ -23,7 +23,6 @@ enum DeploymentPos
     DEPLOYMENT_CSV, // Deployment of BIP68, BIP112, and BIP113.
     DEPLOYMENT_SEGWIT, // Deployment of BIP141, BIP143, and BIP147.
     DEPLOYMENT_NETWORKFEES, // Deployment of network fees
-    DEPLOYMENT_STAKEP2PKH, // Deployment of p2pkh stakes
     // NOTE: Also add new deployments to VersionBitsDeploymentInfo in versionbits.cpp
     MAX_VERSION_BITS_DEPLOYMENTS
 };
@@ -82,23 +81,6 @@ struct Params {
     int64_t DifficultyAdjustmentInterval() const { return nPowTargetTimespan / nPowTargetSpacing; }
     uint256 nMinimumChainWork;
     uint256 defaultAssumeValid;
-    int lastPOWBlock;
-    std::function<CAmount(const int&, const Params &)> GetBlockSubsidy;
-    /** Proof of stake parameters */
-    int stakeMinAge;
-    int stakingModiferV2Block;
-    int coinMaturity;
-    bool stakingAllowsMinDifficultyBlocks{false};
-    int64_t stakingPoSTargetTimespan{60*40};
-    int64_t stakingV05UpgradeTime{0};
-    int64_t stakingV06UpgradeTime{0};
-    int64_t stakingV07UpgradeTime{0};
-    int64_t PoSFutureBlockTimeLimit(const int64_t blockTime) const { // changing this will break consensus!
-        if (blockTime >= stakingV07UpgradeTime)
-            return 15; // seconds in the future
-        else
-            return nPowTargetSpacing * 3;
-    }
     /** Service node parameters */
     int snMaxCollateralCount{10}; // max utxos for use with service node collateral
     /** Governance parameters */

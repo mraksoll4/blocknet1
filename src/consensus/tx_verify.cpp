@@ -4,7 +4,6 @@
 
 #include <consensus/tx_verify.h>
 
-#include <coinvalidator.h>
 #include <consensus/consensus.h>
 #include <primitives/transaction.h>
 #include <script/interpreter.h>
@@ -220,7 +219,7 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, c
         assert(!coin.IsSpent());
 
         // If prev is coinbase or coinstake, check that it's matured. Note coin.IsCoinBase() also returns true for coinstake
-        if (coin.IsCoinBase() && nSpendHeight - coin.nHeight < consensusParams.coinMaturity) {
+        if (coin.IsCoinBase() && nSpendHeight - coin.nHeight < COINBASE_MATURITY) {
             return state.Invalid(false,
                 REJECT_INVALID, "bad-txns-premature-spend-of-coinbase",
                 strprintf("tried to spend coinbase at depth %d", nSpendHeight - coin.nHeight));
@@ -231,11 +230,6 @@ bool Consensus::CheckTxInputs(const CTransaction& tx, CValidationState& state, c
         if (!MoneyRange(coin.out.nValue) || !MoneyRange(nValueIn)) {
             return state.DoS(100, false, REJECT_INVALID, "bad-txns-inputvalues-outofrange");
         }
-    }
-
-    if (tx.IsCoinStake()) { // Blocknet does not handle PoS coinstake fee checks here (see validation.cpp ConnectBlock)
-        txfee = 0;
-        return true;
     }
 
     const CAmount value_out = tx.GetValueOut();

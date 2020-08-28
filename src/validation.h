@@ -235,7 +235,7 @@ static const uint64_t MIN_DISK_SPACE_FOR_BLOCK_FILES = 550 * 1024 * 1024;
  * @param[in]  dbp Block disk position
  * @return True if state.IsValid()
  */
-bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<const CBlock> pblock, bool fForceProcessing, bool* fNewBlock, const CDiskBlockPos* dbp=nullptr) LOCKS_EXCLUDED(cs_main);
+bool ProcessNewBlock(const CChainParams& chainparams, const std::shared_ptr<const CBlock> pblock, bool fForceProcessing, bool* fNewBlock) LOCKS_EXCLUDED(cs_main);
 
 /**
  * Process incoming block headers.
@@ -522,13 +522,6 @@ extern std::atomic<double> meanBlockHeightConnectedNodes;
 extern std::atomic<int> estimatedConnectedNodes;
 
 /**
- * Pubkey used to sign the stake input must match the block signature.
- * @param stakeScript
- * @return
- */
-bool VerifySig(const CBlock & block, const CScript & stakeScript);
-
-/**
  * Only return transaction for utxo that hasn't been spent. If the utxo has been spent
  * this will return nullptr. This method will check the mempool.
  * @param out
@@ -546,16 +539,5 @@ bool GetTxFunc(const COutPoint & out, CTransactionRef & tx);
  */
 static const int SNODE_STALE_BLOCKS = 10; // number of blocks to allow before a snode is marked "stale"
 bool IsServiceNodeBlockValidFunc(const uint64_t & blockNumber, const uint256 & blockHash, const bool & checkStale=true);
-
-/**
- * Return the chain tip.
- * @return
- */
-extern int GetChainTipHeight();
-
-/** hashProofOfStake management */
-uint256 GetHashProofOfStake(const uint256 & blockHash);
-bool HasHashProofOfStake(const uint256 & blockHash);
-void SetHashProofOfStake(const uint256 & blockHash, const uint256 & hashProofOfStake);
 
 #endif // BITCOIN_VALIDATION_H

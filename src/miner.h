@@ -166,12 +166,6 @@ public:
 
     /** Construct a new block template with coinbase to scriptPubKeyIn */
     std::unique_ptr<CBlockTemplate> CreateNewBlock(const CScript& scriptPubKeyIn);
-#ifdef ENABLE_WALLET
-    /** Construct new PoS block */
-    std::unique_ptr<CBlockTemplate> CreateNewBlockPoS(const CInputCoin & stakeInput, const uint256 & stakeBlockHash,
-                                                      const int64_t & stakeTime, const int64_t & blockTime,
-                                                      CWallet *keystore, const bool & disableValidationChecks = false);
-#endif // ENABLE_WALLET
 
     static Optional<int64_t> m_last_block_num_txs;
     static Optional<int64_t> m_last_block_weight;
@@ -213,8 +207,5 @@ private:
 /** Modify the extranonce in a block */
 void IncrementExtraNonce(CBlock* pblock, const CBlockIndex* pindexPrev, unsigned int& nExtraNonce);
 int64_t UpdateTime(CBlockHeader* pblock, const Consensus::Params& consensusParams, const CBlockIndex* pindexPrev);
-
-/** Blocknet PoS */
-extern bool SignBlock(CBlock & block, const CScript & stakeScript, const CKeyStore & keystore);
 
 #endif // BITCOIN_MINER_H
