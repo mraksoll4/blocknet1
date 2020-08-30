@@ -94,8 +94,7 @@ static void ReleaseWallet(CWallet* wallet)
     // Unregister and delete the wallet right after BlockUntilSyncedToCurrentChain
     // so that it's in sync with the current chainstate.
     wallet->WalletLogPrintf("Releasing wallet\n");
-    if (!ShutdownRequested()) // TODO Blocknet needs review (this can hang when syncing many headers prior to block download)
-        wallet->BlockUntilSyncedToCurrentChain();
+    wallet->BlockUntilSyncedToCurrentChain();
     wallet->Flush();
     UnregisterValidationInterface(wallet);
     delete wallet;
@@ -1269,113 +1268,13 @@ void CWallet::BlockConnected(const std::shared_ptr<const CBlock>& pblock, const 
 
 void CWallet::BlockDisconnected(const std::shared_ptr<const CBlock>& pblock) {
     auto locked_chain = chain().lock();
-    {
     LOCK(cs_wallet);
 
     for (const CTransactionRef& ptx : pblock->vtx) {
         SyncTransaction(ptx, {} /* block hash */, 0 /* position in block */);
     }
-    }
-
-    // Blocknet abandon orphaned coinstake
-    abandonOrphanedCoinstake(pblock, *locked_chain);
 }
 
-void CWallet::UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload) {
-    if (pindexNew->nHeight < Params().GetConsensus().governanceBlock)
-        return;
-
-    std::map<int, std::set<uint256>> aban;
-    {
-        LOCK(cs_wallet);
-        aban = orphanedStakeTxs;
-    }
-    if (aban.empty())
-        return;
-
-    // Try and abandon orphaned coinstakes and vote txs
-    for (const auto & item : aban) {
-        for (auto & txhash : item.second) {
-            {
-                LOCK(mempool.cs);
-                auto entry = mempool.mapTx.find(txhash);
-                if (entry != mempool.mapTx.end())
-                    mempool.removeRecursive(entry->GetTx(), MemPoolRemovalReason::REORG);
-            }
-            if (TransactionCanBeAbandoned(txhash)) {
-                auto locked_chain = chain().lock();
-                if (AbandonTransaction(*locked_chain, txhash)) {
-                    LOCK(cs_wallet);
-                    if (!orphanedStakeTxs.count(item.first))
-                        continue;
-                    orphanedStakeTxs[item.first].erase(txhash);
-                    if (orphanedStakeTxs[item.first].empty())
-                        orphanedStakeTxs.erase(item.first);
-                }
-            }
-        }
-    }
-    // Remove stale orphans after 10 blocks from last known orphan height
-    {
-        LOCK(cs_wallet);
-        const auto & blockHeight = pindexNew->nHeight;
-        for (auto it = orphanedStakeTxs.begin(); it != orphanedStakeTxs.end(); ) {
-            if (blockHeight >= it->first + 10)
-                orphanedStakeTxs.erase(it++);
-            else
-                it++;
-        }
-    }
-}
-
-void CWallet::abandonOrphanedCoinstake(const std::shared_ptr<const CBlock> & pblock, interfaces::Chain::Lock & locked_chain) {
-    // Blocknet abandon orphaned coinstake
-    if (pblock->vtx.size() < 2)
-        return;
-    const auto & ptx = pblock->vtx[1];
-    if (!(ptx->IsCoinStake() && IsMine(ptx->vin[0])))
-        return;
-    int blockHeight{0};
-    {
-        LOCK(cs_main);
-        auto pindex = LookupBlockIndex(pblock->GetHash());
-        if (pindex)
-            blockHeight = pindex->nHeight;
-    }
-    if (!TransactionCanBeAbandoned(ptx->GetHash()) || !AbandonTransaction(locked_chain, ptx->GetHash())) {
-        LOCK(cs_wallet);
-        orphanedStakeTxs[blockHeight].insert(ptx->GetHash());
-    }
-    // Abandon any votes that were orphaned
-    if (pblock->vtx.size() < 3)
-        return;
-    std::set<gov::Proposal> ps;
-    std::set<gov::Vote> vs;
-    std::map<uint256, std::set<gov::VinHash>> vh;
-    gov::Governance::instance().dataFromBlock(pblock.get(), ps, vs, vh, Params().GetConsensus(), 0);
-    if (vs.empty())
-        return; // no votes, then done
-    // Any votes cast based on abandoned coinstake implies we can abandon this vote tx
-    std::set<uint256> txhashes;
-    for (const auto & tx : pblock->vtx)
-        txhashes.insert(tx->GetHash());
-    for (const auto & vote : vs) {
-        if (!txhashes.count(vote.getUtxo().hash))
-            continue;
-        // abandon any transactions that vote utxos are referencing
-        if (TransactionCanBeAbandoned(vote.getOutpoint().hash)) {
-            if (AbandonTransaction(locked_chain, vote.getOutpoint().hash)) {
-                continue;
-            } else {
-                LOCK(cs_wallet);
-                orphanedStakeTxs[blockHeight].insert(vote.getOutpoint().hash);
-            }
-        } else {
-            LOCK(cs_wallet);
-            orphanedStakeTxs[blockHeight].insert(vote.getOutpoint().hash);
-        }
-    }
-}
 
 
 void CWallet::BlockUntilSyncedToCurrentChain() {
@@ -1993,7 +1892,7 @@ void CWallet::ReacceptWalletTransactions(interfaces::Chain::Lock& locked_chain)
 bool CWalletTx::RelayWalletTransaction(interfaces::Chain::Lock& locked_chain, CConnman* connman)
 {
     assert(pwallet->GetBroadcastTransactions());
-    if (!IsCoinBase() && !IsCoinStake() && !isAbandoned() && GetDepthInMainChain(locked_chain) == 0)
+    if (!IsCoinBase() && !isAbandoned() && GetDepthInMainChain(locked_chain) == 0)
     {
         CValidationState state;
         /* GetDepthInMainChain already catches known conflicts. */

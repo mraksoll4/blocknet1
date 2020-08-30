@@ -187,8 +187,8 @@ public:
         // subsidy func for superblock
         consensus.GetBlockSubsidy = [](const int & blockHeight, const Consensus::Params & consensusParams) {
             if (blockHeight % consensusParams.superblock == 0)
-                return consensusParams.proposalMaxAmount + 1 * COIN;
-            return 1 * COIN;
+                return consensusParams.proposalMaxAmount + 50 * COIN;
+            return 50 * COIN;
         };
 
     }

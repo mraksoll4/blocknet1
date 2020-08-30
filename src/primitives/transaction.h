@@ -335,13 +335,6 @@ public:
         return (vin.size() == 1 && vin[0].prevout.IsNull());
     }
 
-    // ppcoin: PoS the coin stake transaction is marked with the first output empty
-    bool IsCoinStake() const
-    {
-        return (vin.size() == 1 && !vin[0].prevout.IsNull() && vout.size() >= 2
-                  && vout[0].nValue == 0 && vout[0].scriptPubKey.empty());
-    }
-
     friend bool operator==(const CTransaction& a, const CTransaction& b)
     {
         return a.hash == b.hash;
