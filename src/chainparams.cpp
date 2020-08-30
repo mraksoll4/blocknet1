@@ -1,6 +1,5 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2018 The Bitcoin Core developers
-// Copyright (c) 2017-2020 The Blocknet developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -54,7 +53,7 @@ static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesi
  */
 static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
 {
-    const char* pszTimestamp = "NY Times 05/Oct/2011 Steve Jobs, Apple’s Visionary, Dies at 56";
+    const char* pszTimestamp = "NY Times 05/Oct/2011 Steve Jobs, Appleâ€™s Visionary, Dies at 56";
     const CScript genesisOutputScript = CScript() << ParseHex("040184710fa689ad5023690c80f3a49c8f13f8d45b8c857fbcbc8bc4a8e4d3eb4b10f4d4604fa08dce601aaf0f470216fe1b51850b4acf21b179c45070ac7b03a9") << OP_CHECKSIG;
     return CreateGenesisBlock(pszTimestamp, genesisOutputScript, nTime, nNonce, nBits, nVersion, genesisReward);
 }
@@ -98,8 +97,9 @@ public:
 
         // By default assume that the signatures in ancestors of this block are valid.
         consensus.defaultAssumeValid = uint256S("0xb34a457c601ef8ce3294116e3296078797be7ded1b0d12515395db9ab5e93ab8"); //1683528
-		
+
         consensus.lastPOWBlock = 100000000;
+
         /**
          * The message start string is designed to be unlikely to occur in normal data.
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
@@ -190,12 +190,11 @@ public:
                 return consensusParams.proposalMaxAmount + 50 * COIN;
             return 50 * COIN;
         };
-
     }
 };
 
 /**
- * Testnet (v5)
+ * Testnet (v3)
  */
 class CTestNetParams : public CChainParams {
 public:
@@ -234,6 +233,8 @@ public:
         // By default assume that the signatures in ancestors of this block are valid.
         consensus.defaultAssumeValid = uint256S("0xf19dfbdc0e6c399ef45d315d89fc3e972dd8da74503252bacaf664f64d86e6f6"); //1174621
 
+        consensus.lastPOWBlock = 100000000;
+
         pchMessageStart[0] = 0xfd;
         pchMessageStart[1] = 0xd2;
         pchMessageStart[2] = 0xc8;
@@ -247,8 +248,6 @@ public:
         consensus.hashGenesisBlock = genesis.GetHash();
         assert(consensus.hashGenesisBlock == uint256S("0x4966625a4b2851d9fdee139e56211a0d88575f59ed816ff5e6a63deb4e3e29a0"));
         assert(genesis.hashMerkleRoot == uint256S("0x97ddfbbae6be97fd6cdf3e7ca13232a3afff2353e29badfab7f73011edd4ced9"));
-
-        consensus.lastPOWBlock = 100000000;
 
         vFixedSeeds.clear();
         vSeeds.clear();
