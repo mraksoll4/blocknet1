@@ -14,8 +14,8 @@
 #include <util/system.h>
 #include <util/strencodings.h>
 #include <versionbitsinfo.h>
-
 #include <assert.h>
+#include <validation.h>
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -185,14 +185,18 @@ public:
 
 
         // subsidy func testnet
-        consensus.GetBlockSubsidy = [](const int & blockHeight, const Consensus::Params & consensusParams) {
-            if (blockHeight >= 0)
-                return 50* COIN;
-			else if (blockHeight >= 210000)        
-				return 25 * COIN; // from previous mainnet
+        consensus.GetBlockSubsidy = [](int nHeight, const int & blockHeight, const Consensus::Params & consensusParams) {
+		    int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
+            // Force block reward to zero when right shift is undefined.
+            if (halvings >= 64)
+            return 0;
+            CAmount nSubsidy = 50 * COIN;
+            // Subsidy is cut in half every 210,000 blocks which will occur approximately every 4 years.
             else if (blockHeight >= % consensusParams.superblock == 0)
                 return consensusParams.proposalMaxAmount + 1 * COIN;
             return 1 * COIN;
+			nSubsidy >>= halvings;
+            return nSubsidy;
         };
 
     }
