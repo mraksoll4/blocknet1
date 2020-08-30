@@ -540,4 +540,10 @@ bool GetTxFunc(const COutPoint & out, CTransactionRef & tx);
 static const int SNODE_STALE_BLOCKS = 10; // number of blocks to allow before a snode is marked "stale"
 bool IsServiceNodeBlockValidFunc(const uint64_t & blockNumber, const uint256 & blockHash, const bool & checkStale=true);
 
+/**
+ * Return the chain tip.
+ * @return
+ */
+extern int GetChainTipHeight();
+
 #endif // BITCOIN_VALIDATION_H

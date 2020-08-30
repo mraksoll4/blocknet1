@@ -5020,3 +5020,8 @@ bool IsServiceNodeBlockValidFunc(const uint64_t & blockNumber, const uint256 & b
         return false; // fail if block wasn't found
     return block->GetBlockHash() == blockHash;
 }
+
+int GetChainTipHeight() {
+    LOCK(cs_main);
+    return chainActive.Height();
+}
