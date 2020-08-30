@@ -184,18 +184,11 @@ public:
         consensus.governanceBlock = 4296001;
 
 
-        // subsidy func testnet
-        consensus.GetBlockSubsidy = [](int nHeight, const int & blockHeight, const Consensus::Params & consensusParams) {
-		    int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
-            // Force block reward to zero when right shift is undefined.
-            if (halvings >= 64)
-            return 0;
-            CAmount nSubsidy = 50 * COIN;
-			nSubsidy >>= halvings;
-            // Subsidy is cut in half every 210,000 blocks which will occur approximately every 4 years.
-            if (blockHeight >= % consensusParams.superblock == 0)
+        // subsidy func for superblock
+        consensus.GetBlockSubsidy = [](const int & blockHeight, const Consensus::Params & consensusParams) {
+            if (blockHeight % consensusParams.superblock == 0)
                 return consensusParams.proposalMaxAmount + 1 * COIN;
-            return nSubsidy;
+            return 1 * COIN;
         };
 
     }
