@@ -1905,10 +1905,6 @@ public:
         if (!isSuperblock(blockHeight, params))
             return false;
 
-        // Superblock payout must be in the coinstake
-        if (!block->IsProofOfStake())
-            return false;
-
         // Get the results and sort descending by passing percent.
         // We want to sort descending because the most valuable
         // proposals are those with the highest passing percentage,
