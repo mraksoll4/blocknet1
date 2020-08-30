@@ -151,8 +151,6 @@ endif
 
 if ENABLE_WALLET
 BITCOIN_TESTS += \
-  test/staking_tests.h \
-  test/governance_tests.cpp \
   test/servicenode_tests.cpp \
   wallet/test/db_tests.cpp \
   wallet/test/psbt_wallet_tests.cpp \
