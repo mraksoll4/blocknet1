@@ -231,6 +231,12 @@ AC_ARG_ENABLE([bip70],
   [enable_bip70=$enableval],
   [enable_bip70=auto])
 
+AC_ARG_ENABLE([sse2],
+    [AS_HELP_STRING([--enable-sse2],
+    [enable SSE2 instructions in the scrypt library. (default is disabled)])],
+    [use_sse2=$enableval],
+    [use_sse2=no])
+
 AC_ARG_WITH([protoc-bindir],[AS_HELP_STRING([--with-protoc-bindir=BIN_DIR],[specify protoc bin path])], [protoc_bin_path=$withval], [])
 
 AC_ARG_ENABLE(man,
@@ -735,6 +741,10 @@ if test x$TARGET_OS != xwindows; then
   AX_CHECK_COMPILE_FLAG([-fPIC],[PIC_FLAGS="-fPIC"])
 fi
 
+# All versions of gcc that we commonly use for building are subject to bug
+# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=90348. To work around that, set
+# -fstack-reuse=none for all gcc builds. (Only gcc understands this flag)
+AX_CHECK_COMPILE_FLAG([-fstack-reuse=none],[HARDENED_CXXFLAGS="$HARDENED_CXXFLAGS -fstack-reuse=none"])
 if test x$use_hardening != xno; then
   use_hardening=yes
   AX_CHECK_COMPILE_FLAG([-Wstack-protector],[HARDENED_CXXFLAGS="$HARDENED_CXXFLAGS -Wstack-protector"])
