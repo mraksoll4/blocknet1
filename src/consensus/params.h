@@ -93,8 +93,8 @@ struct Params {
     CAmount proposalMinAmount{10 * COIN};
     CAmount proposalMaxAmount{40000 * COIN};
     CAmount proposalFee{10 * COIN};
-    CAmount voteBalance{5000 * COIN};
-    CAmount voteMinUtxoAmount{100 * COIN};
+    CAmount voteBalance{100 * COIN};
+    CAmount voteMinUtxoAmount{50 * COIN};
     /** Fallback fee **/
     CFeeRate defaultFallbackFee;
 };
