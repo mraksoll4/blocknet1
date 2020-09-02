@@ -371,7 +371,6 @@ private:
     bool cacheStore;
     ScriptError error;
     PrecomputedTransactionData *txdata;
-    bool witnessEnabled{true};
 
 public:
     CScriptCheck(): ptxTo(nullptr), nIn(0), nFlags(0), cacheStore(false), error(SCRIPT_ERR_UNKNOWN_ERROR) {}
@@ -388,12 +387,9 @@ public:
         std::swap(cacheStore, check.cacheStore);
         std::swap(error, check.error);
         std::swap(txdata, check.txdata);
-        std::swap(witnessEnabled, check.witnessEnabled);
     }
 
     ScriptError GetScriptError() const { return error; }
-
-    void DisableWitnessCheck() { witnessEnabled = false; }
 };
 
 /** Initializes the script-execution cache */
