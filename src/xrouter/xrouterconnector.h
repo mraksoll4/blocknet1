@@ -51,7 +51,7 @@ class WalletParam
 {
 public:
     WalletParam()
-        : txVersion(2)
+        : txVersion(1)
         , COIN(0)
         , minTxFee(0)
         , feePerByte(0)
