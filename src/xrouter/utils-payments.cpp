@@ -118,7 +118,7 @@ bool createAndSignTransaction(const std::string & toaddress, const CAmount & toa
         return static_cast<double>(fee) / COIN;
     };
     auto minTxFee2 = [](const uint32_t & inputs, const uint32_t & outputs) -> double {
-        return 1;
+        return 0;
     };
     if (!xbridge::App::instance().selectUtxos("", inputs, minTxFee1, minTxFee2, toamount,
                                               COIN, outputsForUse, utxoAmount, fee1, fee2))
