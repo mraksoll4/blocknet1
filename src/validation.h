@@ -413,9 +413,6 @@ bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams,
 /** Check whether witness commitments are required for block. */
 bool IsWitnessEnabled(const CBlockIndex* pindexPrev, const Consensus::Params& params);
 
-/** Check whether network fees can be spent. */
-bool IsNetworkFeesEnabled(const CBlockIndex* pindexPrev, const Consensus::Params& params);
-
 /** Check whether NULLDUMMY (BIP 147) has activated. */
 bool IsNullDummyEnabled(const CBlockIndex* pindexPrev, const Consensus::Params& params);
 
