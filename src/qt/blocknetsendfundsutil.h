@@ -251,8 +251,6 @@ public:
         auto recipients = txRecipients_;
         for (auto & r : recipients)
             r.fSubtractFeeFromAmount = subtractFee_;
-        if (customFee_)
-            coinControl.m_total_fee = userFee_;
 
         if (hasWalletTx()) {
             delete walletTx_;
@@ -448,8 +446,6 @@ public:
 static std::tuple<CAmount, CAmount, CAmount> BlocknetEstimateFee(WalletModel *walletModel, CCoinControl coinControl,
         const bool subtractFee, const QList<SendCoinsRecipient> & recipients)
 {
-    // Ignore the total fee designation
-    coinControl.m_total_fee.reset();
 
     CAmount nPayAmount = 0;
     bool fDust = false;
