@@ -173,8 +173,7 @@ public:
         };
 
         /* enable fallback fee on mainnet */
-        m_fallback_fee_enabled = true;
-        consensus.defaultFallbackFee = CFeeRate(2000);
+        m_fallback_fee_enabled = false;
 
         // Governance
         consensus.superblock = 43200;
@@ -286,7 +285,6 @@ public:
 
         /* enable fallback fee on testnet */
         m_fallback_fee_enabled = true;
-        consensus.defaultFallbackFee = CFeeRate(2000);
 
         // Governance
         consensus.superblock = 144;
@@ -388,7 +386,6 @@ public:
 
         /* enable fallback fee on regtest */
         m_fallback_fee_enabled = true;
-        consensus.defaultFallbackFee = CFeeRate(2000);
 
         // Governance
         consensus.superblock = 165;

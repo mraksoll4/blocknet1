@@ -94,8 +94,6 @@ struct Params {
     CAmount proposalFee{10 * COIN};
     CAmount voteBalance{100 * COIN};
     CAmount voteMinUtxoAmount{50 * COIN};
-    /** Fallback fee **/
-    CFeeRate defaultFallbackFee;
 };
 } // namespace Consensus
 

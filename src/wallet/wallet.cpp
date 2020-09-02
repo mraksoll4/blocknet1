@@ -2927,8 +2927,6 @@ bool CWallet::CreateTransaction(interfaces::Chain::Lock& locked_chain, const std
             nFeeRet = 0;
             bool pick_new_inputs = true;
             CAmount nValueIn = 0;
-            if (coin_control.m_total_fee) // user specified exact fee
-                nFeeRet = *(coin_control.m_total_fee);
 
             // BnB selector is the only selector used when this is true.
             // That should only happen on the first pass through the loop.
@@ -3057,9 +3055,6 @@ bool CWallet::CreateTransaction(interfaces::Chain::Lock& locked_chain, const std
                     return false;
                 }
 
-                if (coin_control.m_zero_fee)
-                    break; // support 0 fee txs (useful in vote txs)
-                else {
                 nFeeNeeded = GetMinimumFee(*this, nBytes, coin_control, ::mempool, ::feeEstimator, &feeCalc);
                 if (feeCalc.reason == FeeReason::FALLBACK && !m_allow_fallback_fee) {
                     // eventually allow a fallback fee
@@ -3073,15 +3068,6 @@ bool CWallet::CreateTransaction(interfaces::Chain::Lock& locked_chain, const std
                 {
                     strFailReason = _("Transaction too large for fee policy");
                     return false;
-                }
-
-                if (coin_control.m_total_fee) {
-                    // Reject if specified fee is smaller than minimum fee needed
-                    if (*(coin_control.m_total_fee) < nFeeNeeded) {
-                        strFailReason = _("Not enough fee specified to cover the minimum fee");
-                        return false;
-                    }
-                    break; // done, have enough to cover fee
                 }
 
                 if (nFeeRet >= nFeeNeeded) {
@@ -3146,7 +3132,6 @@ bool CWallet::CreateTransaction(interfaces::Chain::Lock& locked_chain, const std
                 nFeeRet = nFeeNeeded;
                 coin_selection_params.use_bnb = false;
                 continue;
-                } // coin_control.m_zero_fee
             }
         }
 
@@ -4341,9 +4326,8 @@ std::shared_ptr<CWallet> CWallet::CreateWalletFromFile(interfaces::Chain& chain,
     }
 
     walletInstance->m_allow_fallback_fee = Params().IsFallbackFeeEnabled();
-    walletInstance->m_fallback_fee = Params().GetConsensus().defaultFallbackFee;
     if (gArgs.IsArgSet("-fallbackfee")) {
-        CAmount nFeePerK = walletInstance->m_fallback_fee.GetFeePerK();
+        CAmount nFeePerK = 0;
         if (!ParseMoney(gArgs.GetArg("-fallbackfee", ""), nFeePerK)) {
             InitError(strprintf(_("Invalid amount for -fallbackfee=<amount>: '%s'"), gArgs.GetArg("-fallbackfee", "")));
             return nullptr;
