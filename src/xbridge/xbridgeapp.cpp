@@ -2209,7 +2209,7 @@ Error App::acceptXBridgeTransaction(const uint256 & id, const std::string & from
 //        for (const auto & utxo : outputs)
 //            std::cout << "    After: " << utxo.txId << " " << utxo.vout << std::endl;
 
-        uint64_t utxoAmount = 1;
+        uint64_t utxoAmount = 0;
         uint64_t fee1       = 0;
         uint64_t fee2       = 0;
 
