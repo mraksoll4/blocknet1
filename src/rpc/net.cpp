@@ -101,7 +101,7 @@ static UniValue getpeerinfo(const JSONRPCRequest& request)
             "    \"minping\": n,              (numeric) minimum observed ping time (if any at all)\n"
             "    \"pingwait\": n,             (numeric) ping wait (if non-zero)\n"
             "    \"version\": v,              (numeric) The peer version, such as 70001\n"
-            "    \"subver\": \"/Satoshi:0.8.5/\",  (string) The string version\n"
+            "    \"subver\": \"/LitecoinFinance:0.8.5/\",  (string) The string version\n"
             "    \"inbound\": true|false,     (boolean) Inbound (true) or Outbound (false)\n"
             "    \"addnode\": true|false,     (boolean) Whether connection was due to addnode/-connect or if it was an automatic/inbound connection\n"
             "    \"startingheight\": n,       (numeric) The starting height (block) of the peer\n"
@@ -454,7 +454,7 @@ static UniValue getnetworkinfo(const JSONRPCRequest& request)
                 RPCResult{
             "{\n"
             "  \"version\": xxxxx,                      (numeric) the server version\n"
-            "  \"subversion\": \"/Satoshi:x.x.x/\",     (string) the server subversion string\n"
+            "  \"subversion\": \"/LitecoinFinance:x.x.x/\",     (string) the server subversion string\n"
             "  \"protocolversion\": xxxxx,              (numeric) the protocol version\n"
             "  \"xbridgeprotocolversion\": xxxxx,       (numeric) the XBridge protocol version\n"
             "  \"xrouterprotocolversion\": xxxxx,       (numeric) the XRouter protocol version\n"
