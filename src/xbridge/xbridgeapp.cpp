@@ -23,6 +23,7 @@
 #include <xbridge/xbridgewalletconnectordevault.h>
 #include <xbridge/xbridgewalletconnectordgb.h>
 #include <xbridge/xbridgewalletconnectorbtg.h>
+#include <xbridge/xbridgewalletconnectorltfn.h>
 #include <xbridge/xbridgewalletconnectorstealth.h>
 #include <xbridge/xbridgepacket.h>
 #include <xbridge/xuiconnector.h>
@@ -342,7 +343,7 @@ bool App::createConf()
                 "# MinimumAmount=0"                                                            + eol +
                 "# TxVersion=1"                                                                + eol +
                 "# DustAmount=0"                                                               + eol +
-                "# CreateTxMethod=BTC"                                                         + eol +
+                "# CreateTxMethod=LTFN"                                                         + eol +
                 "# GetNewKeySupported=true"                                                    + eol +
                 "# ImportWithNoScanSupported=true"                                             + eol +
                 "# MinTxFee=10000"                                                             + eol +
@@ -1066,6 +1067,11 @@ void App::updateActiveWallets()
         else if (wp.method == "BTG")
         {
             conn.reset(new BTGWalletConnector);
+            *conn = wp;
+        }
+		else if (wp.method == "LTFN")
+        {
+            conn.reset(new LTFNWalletConnector);
             *conn = wp;
         }
         else if (wp.method == "DEVAULT")
