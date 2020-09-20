@@ -481,8 +481,8 @@ crypto_libbitcoin_crypto_shani_a_CPPFLAGS += -DENABLE_SHANI
 crypto_libbitcoin_crypto_shani_a_SOURCES = crypto/sha256_shani.cpp
 
 # consensus: shared between all executables that validate any consensus rules.
-libbitcoin_consensus_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-libbitcoin_consensus_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libbitcoin_consensus_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) -fPIC
+libbitcoin_consensus_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS) -fPIC
 libbitcoin_consensus_a_SOURCES = \
   amount.h \
   arith_uint256.cpp \
@@ -491,6 +491,15 @@ libbitcoin_consensus_a_SOURCES = \
   consensus/merkle.h \
   consensus/params.h \
   consensus/validation.h \
+  crypto/yescrypt/yescrypt.h \
+  crypto/yescrypt/yescrypt.c \
+  crypto/yescrypt/sha256.h \
+  crypto/yescrypt/sha256_c.h \
+  crypto/yescrypt/yescrypt-best_c.h \
+  crypto/yescrypt/sysendian.h \
+  crypto/yescrypt/yescrypt-platform_c.h \
+  crypto/yescrypt/yescrypt-opt_c.h \
+  crypto/yescrypt/yescrypt-simd_c.h \
   hash.cpp \
   hash.h \
   prevector.h \

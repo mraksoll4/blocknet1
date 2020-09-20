@@ -885,7 +885,7 @@ UniValue SignTransaction(interfaces::Chain& chain, CMutableTransaction& mtx, con
 
     int nHashType = ParseSighashString(hashType);
 
-    bool fHashSingle = ((nHashType & ~SIGHASH_ANYONECANPAY) == SIGHASH_SINGLE);
+    bool fHashSingle = ((nHashType & ~(SIGHASH_ANYONECANPAY | SIGHASH_FORKID)) == SIGHASH_SINGLE);
 
     // Script verification errors
     UniValue vErrors(UniValue::VARR);
@@ -970,13 +970,19 @@ static UniValue signrawtransactionwithkey(const JSONRPCRequest& request)
                                 },
                         },
                         },
-                    {"sighashtype", RPCArg::Type::STR, /* default */ "ALL", "The signature hash type. Must be one of:\n"
+                    {"sighashtype", RPCArg::Type::STR, /* default */ "ALL|FORKID" , "The signature hash type. Must be one of, use signatures only with FORKID:\n"
             "       \"ALL\"\n"
             "       \"NONE\"\n"
             "       \"SINGLE\"\n"
             "       \"ALL|ANYONECANPAY\"\n"
+            "       \"ALL|FORKID\"\n"
+            "       \"ALL|FORKID|ANYONECANPAY\"\n"
             "       \"NONE|ANYONECANPAY\"\n"
+            "       \"NONE|FORKID\"\n"
+            "       \"NONE|FORKID|ANYONECANPAY\"\n"
             "       \"SINGLE|ANYONECANPAY\"\n"
+            "       \"SINGLE|FORKID\"\n"
+            "       \"SINGLE|FORKID|ANYONECANPAY\"\n"
                     },
                 },
                 RPCResult{

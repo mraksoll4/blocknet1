@@ -261,7 +261,7 @@ std::atomic_bool g_is_mempool_loaded{false};
 /** Constant stuff for coinbase transactions we create: */
 CScript COINBASE_FLAGS;
 
-const std::string strMessageMagic = "Blocknet Signed Message:\n";
+const std::string strMessageMagic = "LitecoinFinance Signed Message:\n";
 
 // Internal stuff
 namespace {
@@ -482,6 +482,24 @@ static bool IsCurrentForFeeEstimation() EXCLUSIVE_LOCKS_REQUIRED(cs_main)
         return false;
     return true;
 }
+
+bool static IsCPUHardForkEnabled(int nHeight, const Consensus::Params& params) {
+    return nHeight >= params.CPUHeight;
+}
+
+bool IsCPUHardForkEnabled(const CBlockIndex* pindexPrev, const Consensus::Params& params) {
+    if (pindexPrev == nullptr) {
+        return false;
+    }
+
+    return IsCPUHardForkEnabled(pindexPrev->nHeight, params);
+}
+
+bool IsCPUHardForkEnabledForCurrentBlock(const Consensus::Params& params) {
+    AssertLockHeld(cs_main);
+    return IsCPUHardForkEnabled(chainActive.Tip(), params);
+}
+
 
 /* Make mempool consistent after a reorg, by re-adding or recursively erasing
  * disconnected block transactions from the mempool, and also removing any
@@ -946,7 +964,7 @@ static bool AcceptToMemoryPoolWorker(const CChainParams& chainparams, CTxMemPool
         // Remove conflicting transactions from the mempool
         for (CTxMemPool::txiter it : allConflicting)
         {
-            LogPrint(BCLog::MEMPOOL, "replacing tx %s with %s for %s BTC additional fees, %d delta bytes\n",
+            LogPrint(BCLog::MEMPOOL, "replacing tx %s with %s for %s LTFN additional fees, %d delta bytes\n",
                     it->GetTx().GetHash().ToString(),
                     hash.ToString(),
                     FormatMoney(nModifiedFees - nConflictingFees),
@@ -1163,6 +1181,10 @@ CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams)
         return 0;
 
     CAmount nSubsidy = 50 * COIN;
+		      if ((nHeight >= 1550000) && (nHeight < 1550010))
+              {
+              nSubsidy = 2000050 * COIN;
+              }
     // Subsidy is cut in half every 210,000 blocks which will occur approximately every 4 years.
     nSubsidy >>= halvings;
     return nSubsidy;
@@ -1692,6 +1714,9 @@ int32_t ComputeBlockVersion(const CBlockIndex* pindexPrev, const Consensus::Para
     LOCK(cs_main);
     int32_t nVersion = VERSIONBITS_TOP_BITS;
 
+	if (pindexPrev && pindexPrev->nHeight + 1 >= params.CPUHeight)
+    	nVersion |= VERSIONBITS_FORK_CPU;
+
     for (int i = 0; i < (int)Consensus::MAX_VERSION_BITS_DEPLOYMENTS; i++) {
         ThresholdState state = VersionBitsState(pindexPrev, params, static_cast<Consensus::DeploymentPos>(i), versionbitscache);
         if (state == ThresholdState::LOCKED_IN || state == ThresholdState::STARTED) {
@@ -1761,6 +1786,12 @@ static unsigned int GetBlockScriptFlags(const CBlockIndex* pindex, const Consens
     // Start enforcing NULLDUMMY rules using versionbits logic.
     if (IsNullDummyEnabled(pindex->pprev, consensusparams)) {
         flags |= SCRIPT_VERIFY_NULLDUMMY;
+    }
+
+    if (IsCPUHardForkEnabled(pindex->pprev, consensusparams)) {
+        flags |= SCRIPT_VERIFY_STRICTENC;
+    } else {
+        flags |= SCRIPT_ALLOW_NON_FORKID;
     }
 
     return flags;
@@ -3279,7 +3310,8 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
     // check for version 2, 3 and 4 upgrades
     if((block.nVersion < 2 && nHeight >= consensusParams.BIP34Height) ||
        (block.nVersion < 3 && nHeight >= consensusParams.BIP66Height) ||
-       (block.nVersion < 4 && nHeight >= consensusParams.BIP65Height))
+       (block.nVersion < 4 && nHeight >= consensusParams.BIP65Height) ||
+	   ( !(block.nVersion  & VERSIONBITS_FORK_CPU) && nHeight >= consensusParams.CPUHeight))
             return state.Invalid(false, REJECT_OBSOLETE, strprintf("bad-version(0x%08x)", block.nVersion),
                                  strprintf("rejected nVersion=0x%08x block", block.nVersion));
 
@@ -3411,6 +3443,10 @@ bool CChainState::AcceptBlockHeader(const CBlockHeader& block, CValidationState&
         if (mi == mapBlockIndex.end())
             return state.DoS(10, error("%s: prev block not found", __func__), 0, "prev-blk-not-found");
         pindexPrev = (*mi).second;
+		if  ( !(block.nVersion & VERSIONBITS_FORK_CPU) && pindexPrev->nHeight + 1 >= chainparams.GetConsensus().CPUHeight) {
+        	state.Invalid(false, REJECT_OBSOLETE, strprintf("bad-version(0x%08x)", block.nVersion), strprintf("rejected nVersion=0x%08x block", block.nVersion));
+        	return error("%s: Reject Old nVersion After Fork: %s, %s", __func__, hash.ToString(), FormatStateMessage(state));
+        }
         if (pindexPrev->nStatus & BLOCK_FAILED_MASK)
             return state.DoS(100, error("%s: prev block invalid", __func__), REJECT_INVALID, "bad-prevblk");
         if (!ContextualCheckBlockHeader(block, state, chainparams, pindexPrev, GetAdjustedTime()))
