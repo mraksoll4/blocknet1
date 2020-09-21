@@ -94,15 +94,15 @@ unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nF
 unsigned int static DarkGravityWave(const CBlockIndex* pindexLast, const Consensus::Params& params) {
     /* current difficulty formula, dash - DarkGravity v3, written by Evan Duffield - evan@dash.org */
     const arith_uint256 bnPowLimit = UintToArith256(params.powLimit);
-	unsigned int nProofOfWorkLimit = UintToArith256(params.powLimit).GetCompact();
     int64_t nPastBlocks = 12;
 	
-	// Diff drop to pow limit solution
-	if ((pindexLast->nHeight+1 >= 1823085) && (pindexLast->nHeight+1 < 1833085))
-        return nProofOfWorkLimit;
-		
+    //Diff drop to pow limit solution
+    if ((pindexLast->nHeight+1 >= 1823085) && (pindexLast->nHeight+1 < 1833085)) {
+        return bnPowLimit.GetCompact();
+    }
+	
     // make sure we have at least (nPastBlocks + 1) blocks, otherwise just return powLimit
-    if (!pindexLast || pindexLast->nHeight < nPastBlocks) {
+    if ((!pindexLast || pindexLast->nHeight < nPastBlocks) && ((pindexLast->nHeight+1 < 1823085) || (pindexLast->nHeight+1 > 1833085))) {
         return bnPowLimit.GetCompact();
     }
 
