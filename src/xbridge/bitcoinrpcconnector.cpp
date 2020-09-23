@@ -226,7 +226,7 @@ bool createFeeTransaction(const CScript & dstScript, const double amount, const 
                     throw std::runtime_error("Unable to send fee tx, wallet is locked");
                 const auto & prevtxout = wtx->tx->vout[vin.prevout.n];
                 SignatureData sigdata = DataFromTransaction(mtx, i, prevtxout);
-                ProduceSignature(*wallet, MutableTransactionSignatureCreator(&mtx, i, prevtxout.nValue, SIGHASH_ALL | SIGHASH_FORKID),
+                ProduceSignature(*wallet, MutableTransactionSignatureCreator(&mtx, i, prevtxout.nValue, SIGHASH_ALL),
                                  prevtxout.scriptPubKey, sigdata);
                 UpdateInput(mtx.vin[i], sigdata);
             }
